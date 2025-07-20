@@ -1,9 +1,10 @@
 package main
 
 import (
-	"fmt"
 	"log"
 
+	"github.com/brkss/nightscout-twillio-alerts/src/nightscout"
+	"github.com/brkss/nightscout-twillio-alerts/src/twilio"
 	config "github.com/brkss/nightscout-twillio-alerts/src/utils"
 	/*
 		"os"
@@ -19,30 +20,10 @@ func main() {
 		log.Panic("Invalid Config File ! : ", err)
 	}
 
-	fmt.Println("account sid : ", config.AccountSID)
+	twilioService := twilio.NewTwilioService(*config)
+	nightscoutService := nightscout.NewNightscoutService(*config, *twilioService)
 
-	/*
-		accountSid := ""
-		authToken := ""
-		twilioNumber := ""   // Your Twilio number
-		personalNumber := "" // Your personal phone number
+	// run nightscout service loop
+	nightscoutService.NightscoutBloodSugarCheckRoutine()
 
-		client := twilio.NewRestClientWithParams(twilio.ClientParams{
-			Username: accountSid,
-			Password: authToken,
-		})
-
-		params := &openapi.CreateCallParams{}
-		params.SetTo(personalNumber)
-		params.SetFrom(twilioNumber)
-		params.SetUrl("http://demo.twilio.com/docs/voice.xml") // TwiML instructions
-
-		resp, err := client.Api.CreateCall(params)
-		if err != nil {
-			fmt.Println("❌ Error making call:", err.Error())
-			os.Exit(1)
-		}
-
-		fmt.Println("✅ Call initiated! SID:", *resp.Sid)
-	*/
 }

@@ -7,23 +7,26 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/brkss/nightscout-twillio-alerts/src/twilio"
 	config "github.com/brkss/nightscout-twillio-alerts/src/utils"
 )
 
 type NightscoutEntry struct {
-	Date       int64  `json:"date"`       // Timestamp in ms
-	Sgv        int    `json:"sgv"`        // Blood sugar value in mg/dL
-	DateString string `json:"dateString"` // Optional: ISO string
+	Date       int64   `json:"date"`       // Timestamp in ms
+	Sgv        float64 `json:"sgv"`        // Blood sugar value in mg/dL
+	DateString string  `json:"dateString"` // Optional: ISO string
 }
 
 type NightscoutService struct {
-	config config.Config
+	config        config.Config
+	twilioService twilio.TwilioService
 	// add tewillio service
 }
 
-func NewNightscoutService(config config.Config) *NightscoutService {
+func NewNightscoutService(config config.Config, twilioService twilio.TwilioService) *NightscoutService {
 	return &NightscoutService{
 		config,
+		twilioService,
 	}
 }
 
@@ -50,7 +53,7 @@ func (ns *NightscoutService) fetchLatestEntry() (*NightscoutEntry, error) {
 	return &entries[0], nil
 }
 
-func (ns *NightscoutService) NightscoutBloodSugarCheckRoutine(conf config.Config) {
+func (ns *NightscoutService) NightscoutBloodSugarCheckRoutine() {
 	for {
 		entry, err := ns.fetchLatestEntry()
 		if err != nil {
@@ -60,11 +63,17 @@ func (ns *NightscoutService) NightscoutBloodSugarCheckRoutine(conf config.Config
 		}
 
 		timestamp := time.UnixMilli(entry.Date)
-		fmt.Printf("Fetched at: %s | SGV: %d\n", timestamp.Format(time.RFC3339), entry.Sgv)
+		fmt.Printf("Fetched at: %v | SGV: %v\n", timestamp.Format(time.RFC3339), entry.Sgv)
 
-		if entry.Sgv < 80 {
+		if entry.Sgv < 70 {
 			// call twillio service !
 			fmt.Println("⚠️ Alert: Blood sugar is low (< 80 mg/dL)")
+
+			err := ns.twilioService.CallUrgentLow()
+			if err != nil {
+				fmt.Println("============= 🚨 ERROR ACCURED WHILE CALLING =============")
+			}
+
 		}
 
 		nextFetch := timestamp.Add(5 * time.Minute)
