@@ -13,6 +13,7 @@ type Config struct {
 	AuthToken string;
 	TwilioNumber string;
 	PersonalNumber string;
+	NightscoutURL string;
 }
 
 
@@ -26,5 +27,6 @@ func NewConfig() (*Config, error) {
 		AuthToken: os.Getenv("AUTH_TOKEN"),
 		TwilioNumber: os.Getenv("TWILLIO_NUMBER"),
 		PersonalNumber: os.Getenv("PERSONAL_NUMBER"),
+		NightscoutURL: os.Getenv("NIGHTSCOUT_URL"),
 	}, nil
 }
