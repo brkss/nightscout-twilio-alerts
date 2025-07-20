@@ -17,6 +17,7 @@ A Go service that monitors your [Nightscout](https://www.nightscout.info/) insta
 ├── example.env
 ├── go.mod
 ├── go.sum
+├── Makefile
 └── src
     ├── main.go
     ├── nightscout/
@@ -38,13 +39,13 @@ cd nightscout-twillio-alerts
 
 ### 2. Configure Environment Variables
 
-Copy [`example.env`](example.env ) to [`.env`](.env ) and fill in your credentials:
+Copy [`example.env`](example.env) to [`.env`](.env) and fill in your credentials:
 
 ```sh
 cp example.env .env
 ```
 
-Edit [`.env`](.env ):
+Edit [`.env`](.env):
 
 ```env
 ACCOUNT_SID=your_twilio_account_sid
@@ -60,7 +61,16 @@ NIGHTSCOUT_URL=https://your-nightscout.herokuapp.com
 go mod tidy
 ```
 
-### 4. Run the Service
+### 4. Build and Run the Service
+
+You can use the provided `Makefile`:
+
+```sh
+make build
+make run
+```
+
+Or run directly:
 
 ```sh
 go run ./src/main.go
@@ -68,19 +78,17 @@ go run ./src/main.go
 
 ## How it Works
 
-- [`main.go`](src/main.go ) loads configuration and starts the monitoring loop.
-- [`nightscout/nightscout.go`](src/nightscout/nightscout.go ) fetches the latest blood sugar entry and triggers alerts.
-- [`twilio/twilio.go`](src/twilio/twilio.go ) handles phone call alerts via Twilio.
-- [`utils/config.go`](src/utils/config.go ) loads environment variables.
+- [`main.go`](src/main.go) loads configuration and starts the monitoring loop.
+- [`nightscout/nightscout.go`](src/nightscout/nightscout.go) fetches the latest blood sugar entry and triggers alerts.
+- [`twilio/twilio.go`](src/twilio/twilio.go) handles phone call alerts via Twilio.
+- [`utils/config.go`](src/utils/config.go) loads environment variables.
 
 ## Notes
 
 - Make sure your Twilio account is set up and your phone numbers are verified.
-- The [`.env`](.env ) file is ignored by git for security.
+- The [`.env`](.env) file is ignored by git for security.
 - The polling interval is 5 minutes by default.
 
 ## License
 
 MIT
-
----
